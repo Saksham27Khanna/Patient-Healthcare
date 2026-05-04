@@ -1,227 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import Loader from "../components/Loader";
-
-// const Appointments = () => {
-//     const [appointments, setAppointments] = useState([]);
-//     const [loading, setLoading] = useState(true);
-
-//     const [formData, setFormData] = useState({
-//         doctor: "",
-//         date: "",
-//         time: "",
-//     });
-
-//     // ✅ Default appointments (always fixed)
-//     const defaultAppointments = [
-//         {
-//             id: 1,
-//             doctor: "Dr. Sharma",
-//             date: "2026-05-05",
-//             time: "10:30 AM",
-//             status: "Confirmed",
-//             isDefault: true,
-//         },
-//         {
-//             id: 2,
-//             doctor: "Dr. Mehta",
-//             date: "2026-05-06",
-//             time: "12:00 PM",
-//             status: "Pending",
-//             isDefault: true,
-//         },
-//     ];
-
-//     // ✅ Load from localStorage
-//     useEffect(() => {
-//         const stored = localStorage.getItem("appointments");
-
-//         if (stored) {
-//             setAppointments(JSON.parse(stored));
-//         } else {
-//             setAppointments(defaultAppointments);
-//             localStorage.setItem(
-//                 "appointments",
-//                 JSON.stringify(defaultAppointments)
-//             );
-//         }
-
-//         setLoading(false);
-//     }, []);
-
-//     // input change
-//     const handleChange = (e) => {
-//         setFormData({ ...formData, [e.target.name]: e.target.value });
-//     };
-
-//     // ✅ Add Appointment (user only)
-//     const handleAdd = (e) => {
-//         e.preventDefault();
-
-//         const randomStatus = Math.random() < 0.4 ? "Pending" : "Confirmed";
-
-//         const newAppointment = {
-//             id: Date.now(),
-//             ...formData,
-//             status: randomStatus,
-//             isDefault: false,
-//         };
-
-//         const updated = [...appointments, newAppointment];
-
-//         setAppointments(updated);
-//         localStorage.setItem("appointments", JSON.stringify(updated));
-
-//         setFormData({
-//             doctor: "",
-//             date: "",
-//             time: "",
-//         });
-//     };
-
-//     // ❌ Cancel ONLY user appointments
-//     const handleCancel = (id) => {
-//         const updated = appointments.map((appt) =>
-//             appt.id === id && !appt.isDefault
-//                 ? { ...appt, status: "Cancelled" }
-//                 : appt
-//         );
-
-//         setAppointments(updated);
-//         localStorage.setItem("appointments", JSON.stringify(updated));
-//     };
-
-//     // 🧹 Clear ONLY user appointments
-//     const handleClearAll = () => {
-//         const confirmClear = window.confirm(
-//             "This will delete only user-added appointments"
-//         );
-
-//         if (confirmClear) {
-//             const onlyDefaults = appointments.filter((a) => a.isDefault);
-//             setAppointments(onlyDefaults);
-//             localStorage.setItem(
-//                 "appointments",
-//                 JSON.stringify(onlyDefaults)
-//             );
-//         }
-//     };
-
-//     if (loading) {
-//         return <Loader />;
-//     }
-
-//     return (
-//         <div className="p-6">
-
-//             {/* Header */}
-//             <div className="flex justify-between items-center mb-6">
-//                 <h1 className="text-2xl font-bold">Appointments</h1>
-
-//                 <button
-//                     onClick={handleClearAll}
-//                     className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 text-sm"
-//                 >
-//                     Clear All Appointments
-//                 </button>
-//             </div>
-
-//             {/* Add Appointment Form */}
-//             <form
-//                 onSubmit={handleAdd}
-//                 className="bg-white p-4 rounded-xl shadow-md mb-6 grid grid-cols-3 gap-4"
-//             >
-//                 <input
-//                     type="text"
-//                     name="doctor"
-//                     placeholder="Doctor Name"
-//                     value={formData.doctor}
-//                     onChange={handleChange}
-//                     className="border p-2 rounded"
-//                     required
-//                 />
-
-//                 <input
-//                     type="date"
-//                     name="date"
-//                     value={formData.date}
-//                     onChange={handleChange}
-//                     className="border p-2 rounded"
-//                     required
-//                 />
-
-//                 <input
-//                     type="text"
-//                     name="time"
-//                     placeholder="Time (e.g. 10:30 AM)"
-//                     value={formData.time}
-//                     onChange={handleChange}
-//                     className="border p-2 rounded"
-//                     required
-//                 />
-
-//                 <button className="col-span-3 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-//                     Book Appointment
-//                 </button>
-//             </form>
-
-//             {/* Appointment List */}
-//             <div className="grid grid-cols-2 gap-4">
-//                 {appointments.length === 0 ? (
-//                     <p className="text-gray-500">No appointments available</p>
-//                 ) : (
-//                     appointments.map((appt) => (
-//                         <div
-//                             key={appt.id}
-//                             className="bg-white p-4 rounded-xl shadow-md flex justify-between items-center"
-//                         >
-//                             <div>
-//                                 <p className="font-semibold">{appt.doctor}</p>
-//                                 <p className="text-sm text-gray-500">
-//                                     {appt.date} • {appt.time}
-//                                 </p>
-//                             </div>
-
-//                             <div className="flex flex-col items-end gap-2">
-
-//                                 {/* Status */}
-//                                 <span
-//                                     className={`text-xs px-3 py-1 rounded-full ${appt.status === "Confirmed"
-//                                         ? "bg-green-100 text-green-600"
-//                                         : appt.status === "Cancelled"
-//                                             ? "bg-red-100 text-red-600"
-//                                             : "bg-yellow-100 text-yellow-600"
-//                                         }`}
-//                                 >
-//                                     {appt.status}
-//                                 </span>
-
-//                                 {/* Cancel button only for user appointments */}
-//                                 {appt.status !== "Cancelled" && !appt.isDefault && (
-//                                     <button
-//                                         onClick={() => handleCancel(appt.id)}
-//                                         className="text-xs text-red-500 hover:underline"
-//                                     >
-//                                         Cancel
-//                                     </button>
-//                                 )}
-//                             </div>
-//                         </div>
-//                     ))
-//                 )}
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default Appointments;
-
-
-
-
-
-
-
-
 
 // import React, { useEffect, useState } from "react";
 // import Loader from "../components/Loader";
@@ -240,9 +16,10 @@
 
 //     const [editId, setEditId] = useState(null);
 
+//     // 🔒 ALWAYS FIXED DEFAULT
 //     const defaultAppointments = [
 //         {
-//             id: 1,
+//             id: "default-1",
 //             title: "General Checkup",
 //             doctor: "Dr. Sharma",
 //             date: "2026-05-05",
@@ -252,7 +29,7 @@
 //             isDefault: true,
 //         },
 //         {
-//             id: 2,
+//             id: "default-2",
 //             title: "Dental Visit",
 //             doctor: "Dr. Mehta",
 //             date: "2026-05-06",
@@ -263,39 +40,35 @@
 //         },
 //     ];
 
+//     // ✅ LOAD DATA
 //     useEffect(() => {
-//         const stored = localStorage.getItem("appointments");
+//         const stored = JSON.parse(localStorage.getItem("appointments")) || [];
 
-//         if (stored) {
-//             setAppointments(JSON.parse(stored));
-//         } else {
-//             setAppointments(defaultAppointments);
-//             localStorage.setItem(
-//                 "appointments",
-//                 JSON.stringify(defaultAppointments)
-//             );
-//         }
+//         // 🔥 Merge default + user data (IMPORTANT FIX)
+//         const merged = [
+//             ...defaultAppointments,
+//             ...stored.filter((a) => !a.isDefault),
+//         ];
 
+//         setAppointments(merged);
 //         setLoading(false);
 //     }, []);
 
+//     // input
 //     const handleChange = (e) => {
 //         setFormData({ ...formData, [e.target.name]: e.target.value });
 //     };
 
+//     // ✅ ADD / UPDATE
 //     const handleSubmit = (e) => {
 //         e.preventDefault();
 
+//         let updated;
+
 //         if (editId) {
-//             const updated = appointments.map((appt) =>
-//                 appt.id === editId
-//                     ? { ...appt, ...formData }
-//                     : appt
+//             updated = appointments.map((appt) =>
+//                 appt.id === editId ? { ...appt, ...formData } : appt
 //             );
-
-//             setAppointments(updated);
-//             localStorage.setItem("appointments", JSON.stringify(updated));
-
 //             setEditId(null);
 //         } else {
 //             const newAppt = {
@@ -304,12 +77,14 @@
 //                 status: "Upcoming",
 //                 isDefault: false,
 //             };
-
-//             const updated = [...appointments, newAppt];
-
-//             setAppointments(updated);
-//             localStorage.setItem("appointments", JSON.stringify(updated));
+//             updated = [...appointments, newAppt];
 //         }
+
+//         // ❗ Save ONLY user appointments
+//         const onlyUser = updated.filter((a) => !a.isDefault);
+
+//         setAppointments(updated);
+//         localStorage.setItem("appointments", JSON.stringify(onlyUser));
 
 //         window.dispatchEvent(new Event("appointmentsUpdated"));
 
@@ -322,28 +97,35 @@
 //         });
 //     };
 
+//     // ✅ STATUS UPDATE (default allowed but not deleted)
 //     const updateStatus = (id, status) => {
 //         const updated = appointments.map((appt) =>
 //             appt.id === id ? { ...appt, status } : appt
 //         );
 
+//         const onlyUser = updated.filter((a) => !a.isDefault);
+
 //         setAppointments(updated);
-//         localStorage.setItem("appointments", JSON.stringify(updated));
+//         localStorage.setItem("appointments", JSON.stringify(onlyUser));
 
 //         window.dispatchEvent(new Event("appointmentsUpdated"));
 //     };
 
+//     // ❌ DELETE ONLY USER
 //     const handleDelete = (id) => {
 //         const updated = appointments.filter(
 //             (appt) => !(appt.id === id && !appt.isDefault)
 //         );
 
+//         const onlyUser = updated.filter((a) => !a.isDefault);
+
 //         setAppointments(updated);
-//         localStorage.setItem("appointments", JSON.stringify(updated));
+//         localStorage.setItem("appointments", JSON.stringify(onlyUser));
 
 //         window.dispatchEvent(new Event("appointmentsUpdated"));
 //     };
 
+//     // ✏️ EDIT ONLY USER
 //     const handleEdit = (appt) => {
 //         if (appt.isDefault) return;
 
@@ -375,7 +157,7 @@
 //                 <input
 //                     type="text"
 //                     name="title"
-//                     placeholder="Title (Checkup, Dental...)"
+//                     placeholder="Title"
 //                     value={formData.title}
 //                     onChange={handleChange}
 //                     className="border p-2 rounded"
@@ -427,47 +209,30 @@
 //             {/* LIST */}
 //             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 //                 {appointments.map((appt) => (
-//                     <div
-//                         key={appt.id}
-//                         className="bg-white p-4 rounded-xl shadow-md"
-//                     >
+//                     <div key={appt.id} className="bg-white p-4 rounded-xl shadow-md">
+
 //                         <p className="font-semibold">{appt.title}</p>
-//                         <p className="text-sm text-gray-500">
-//                             {appt.doctor}
-//                         </p>
+//                         <p className="text-sm text-gray-500">{appt.doctor}</p>
 //                         <p className="text-sm text-gray-500">
 //                             {appt.date} • {appt.time}
 //                         </p>
-//                         <p className="text-xs text-gray-400">
-//                             {appt.notes}
-//                         </p>
+//                         <p className="text-xs text-gray-400">{appt.notes}</p>
 
-//                         <span
-//                             className={`text-xs px-3 py-1 rounded-full mt-2 inline-block ${appt.status === "Completed"
-//                                 ? "bg-green-100 text-green-600"
-//                                 : appt.status === "Cancelled"
-//                                     ? "bg-red-100 text-red-600"
-//                                     : "bg-yellow-100 text-yellow-600"
-//                                 }`}
-//                         >
+//                         <span className="text-xs px-3 py-1 rounded-full mt-2 inline-block bg-yellow-100 text-yellow-600">
 //                             {appt.status}
 //                         </span>
 
 //                         <div className="flex flex-wrap gap-2 mt-3">
 
 //                             <button
-//                                 onClick={() =>
-//                                     updateStatus(appt.id, "Completed")
-//                                 }
+//                                 onClick={() => updateStatus(appt.id, "Completed")}
 //                                 className="text-xs bg-green-500 text-white px-2 py-1 rounded"
 //                             >
 //                                 Complete
 //                             </button>
 
 //                             <button
-//                                 onClick={() =>
-//                                     updateStatus(appt.id, "Cancelled")
-//                                 }
+//                                 onClick={() => updateStatus(appt.id, "Cancelled")}
 //                                 className="text-xs bg-red-500 text-white px-2 py-1 rounded"
 //                             >
 //                                 Cancel
@@ -483,10 +248,8 @@
 //                                     </button>
 
 //                                     <button
-//                                         onClick={() =>
-//                                             handleDelete(appt.id)
-//                                         }
-//                                         className="text-xs text-red-500 sm:ml-auto"
+//                                         onClick={() => handleDelete(appt.id)}
+//                                         className="text-xs text-red-500"
 //                                     >
 //                                         Delete
 //                                     </button>
@@ -501,8 +264,6 @@
 // };
 
 // export default Appointments;
-
-
 
 
 import React, { useEffect, useState } from "react";
@@ -522,7 +283,7 @@ const Appointments = () => {
 
     const [editId, setEditId] = useState(null);
 
-    // 🔒 ALWAYS FIXED DEFAULT
+    // 🔒 DEFAULT DATA (ONLY UI SIDE, NOT STORED)
     const defaultAppointments = [
         {
             id: "default-1",
@@ -546,23 +307,28 @@ const Appointments = () => {
         },
     ];
 
-    // ✅ LOAD DATA
+    // ✅ LOAD DATA (FIXED)
     useEffect(() => {
         const stored = JSON.parse(localStorage.getItem("appointments")) || [];
 
-        // 🔥 Merge default + user data (IMPORTANT FIX)
-        const merged = [
-            ...defaultAppointments,
-            ...stored.filter((a) => !a.isDefault),
-        ];
+        // only user data comes from storage
+        const merged = [...defaultAppointments, ...stored];
 
         setAppointments(merged);
         setLoading(false);
     }, []);
 
-    // input
+    // input handler
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    // ✅ SAVE TO STORAGE (ONLY USER DATA)
+    const saveToStorage = (updatedList) => {
+        const userOnly = updatedList.filter((a) => !a.isDefault);
+        localStorage.setItem("appointments", JSON.stringify(userOnly));
+
+        window.dispatchEvent(new Event("appointmentsUpdated"));
     };
 
     // ✅ ADD / UPDATE
@@ -586,13 +352,8 @@ const Appointments = () => {
             updated = [...appointments, newAppt];
         }
 
-        // ❗ Save ONLY user appointments
-        const onlyUser = updated.filter((a) => !a.isDefault);
-
         setAppointments(updated);
-        localStorage.setItem("appointments", JSON.stringify(onlyUser));
-
-        window.dispatchEvent(new Event("appointmentsUpdated"));
+        saveToStorage(updated);
 
         setFormData({
             title: "",
@@ -603,35 +364,25 @@ const Appointments = () => {
         });
     };
 
-    // ✅ STATUS UPDATE (default allowed but not deleted)
+    // ✅ STATUS UPDATE
     const updateStatus = (id, status) => {
         const updated = appointments.map((appt) =>
             appt.id === id ? { ...appt, status } : appt
         );
 
-        const onlyUser = updated.filter((a) => !a.isDefault);
-
         setAppointments(updated);
-        localStorage.setItem("appointments", JSON.stringify(onlyUser));
-
-        window.dispatchEvent(new Event("appointmentsUpdated"));
+        saveToStorage(updated);
     };
 
-    // ❌ DELETE ONLY USER
+    // ❌ DELETE (ONLY USER DATA)
     const handleDelete = (id) => {
-        const updated = appointments.filter(
-            (appt) => !(appt.id === id && !appt.isDefault)
-        );
-
-        const onlyUser = updated.filter((a) => !a.isDefault);
+        const updated = appointments.filter((appt) => appt.id !== id);
 
         setAppointments(updated);
-        localStorage.setItem("appointments", JSON.stringify(onlyUser));
-
-        window.dispatchEvent(new Event("appointmentsUpdated"));
+        saveToStorage(updated);
     };
 
-    // ✏️ EDIT ONLY USER
+    // ✏️ EDIT
     const handleEdit = (appt) => {
         if (appt.isDefault) return;
 
