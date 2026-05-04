@@ -202,10 +202,7 @@ import Loader from "../components/Loader";
 
 const Dashboard = () => {
     const [appointments, setAppointments] = useState([]);
-    const [medications, setMedications] = useState(() => {
-        const stored = localStorage.getItem("medications");
-        return stored ? JSON.parse(stored) : defaultMedications;
-    });
+    const [medications, setMedications] = useState([]);
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(true);
 
