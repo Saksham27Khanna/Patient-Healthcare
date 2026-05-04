@@ -78,6 +78,7 @@ const AppRoutes = () => {
                     <Route path="medications" element={<Medications />} />
                     <Route path="notes" element={<Notes />} />
                     <Route path="resources" element={<Resources />} />
+                    <Route path="*" element={<Navigate to="/" />} />
                 </Route>
 
             </Routes>
