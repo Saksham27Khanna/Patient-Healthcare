@@ -38,11 +38,19 @@ const Signup = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+        <div
+            className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center relative"
+            style={{
+                backgroundImage: "url('/background.jpg')" // 👈 same image from public folder
+            }}
+        >
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/40"></div>
 
+            {/* Form */}
             <form
                 onSubmit={handleSignup}
-                className="bg-white p-5 sm:p-8 rounded-xl shadow-md w-full max-w-sm"
+                className="relative bg-white/90 backdrop-blur-md p-5 sm:p-8 rounded-2xl shadow-lg w-full max-w-sm"
             >
                 <h2 className="text-xl sm:text-2xl font-bold mb-5 text-center">
                     Signup
@@ -78,7 +86,7 @@ const Signup = () => {
                     required
                 />
 
-                <button className="bg-green-600 text-white w-full py-2 rounded mb-3 text-sm sm:text-base">
+                <button className="bg-green-600 hover:bg-green-700 transition text-white w-full py-2 rounded mb-3 text-sm sm:text-base">
                     Signup
                 </button>
 
@@ -86,13 +94,12 @@ const Signup = () => {
                     Already have an account?{" "}
                     <span
                         onClick={() => navigate("/login")}
-                        className="text-blue-600 cursor-pointer"
+                        className="text-blue-600 cursor-pointer hover:underline"
                     >
                         Login
                     </span>
                 </p>
             </form>
-
         </div>
     );
 };
