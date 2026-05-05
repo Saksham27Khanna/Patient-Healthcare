@@ -152,7 +152,7 @@ const Dashboard = () => {
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
                 <Card title="Appointments" value={appointments.length} />
-                <Card title="Medications" value={medications.length} />
+                <Card title="Medications" value={medications.filter(med => !med.isDefault).length} />
                 <Card title="Notes" value={notes.length} />
             </div>
 
