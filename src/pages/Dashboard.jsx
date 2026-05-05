@@ -60,7 +60,10 @@ const Dashboard = () => {
 
     const loadMedications = () => {
         const stored = JSON.parse(localStorage.getItem("medications")) || [];
-        setMedications([...defaultMedications, ...stored]);
+
+        const userOnly = stored.filter((med) => !med.isDefault);
+
+        setMedications([...defaultMedications, ...userOnly]);
     };
 
     const loadNotes = () => {

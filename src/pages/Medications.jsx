@@ -197,8 +197,6 @@
 
 
 
-
-
 import React, { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 
@@ -213,9 +211,10 @@ const Medications = () => {
         instructions: "",
     });
 
+    // ✅ DEFAULT (UI ONLY)
     const defaultMeds = [
         {
-            id: 1,
+            id: "med-1",
             name: "Paracetamol",
             dosage: "500mg",
             time: "Morning",
@@ -224,7 +223,7 @@ const Medications = () => {
             isDefault: true,
         },
         {
-            id: 2,
+            id: "med-2",
             name: "Vitamin D",
             dosage: "1000 IU",
             time: "Evening",
@@ -234,16 +233,10 @@ const Medications = () => {
         },
     ];
 
+    // ✅ ONLY LOAD USER DATA
     useEffect(() => {
-        const stored = localStorage.getItem("medications");
-
-        if (stored) {
-            setMedications(JSON.parse(stored));
-        } else {
-            setMedications(defaultMeds);
-            localStorage.setItem("medications", JSON.stringify(defaultMeds));
-        }
-
+        const stored = JSON.parse(localStorage.getItem("medications")) || [];
+        setMedications(stored);
         setLoading(false);
     }, []);
 
@@ -251,6 +244,7 @@ const Medications = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // ✅ ADD (ONLY USER DATA)
     const handleAdd = (e) => {
         e.preventDefault();
 
@@ -276,6 +270,7 @@ const Medications = () => {
         });
     };
 
+    // ✅ STATUS UPDATE (ONLY USER DATA)
     const updateStatus = (id, newStatus) => {
         const updated = medications.map((med) =>
             med.id === id ? { ...med, status: newStatus } : med
@@ -287,32 +282,27 @@ const Medications = () => {
         window.dispatchEvent(new Event("medicationsUpdated"));
     };
 
+    // ✅ DELETE (ONLY USER DATA)
     const handleDelete = (id) => {
-        const updated = medications.filter(
-            (med) => !(med.id === id && !med.isDefault)
-        );
+        const updated = medications.filter((med) => med.id !== id);
 
         setMedications(updated);
-
-        // 🔥 store ONLY user data
-        const userOnly = updated.filter((med) => !med.isDefault);
-        localStorage.setItem("medications", JSON.stringify(userOnly));
+        localStorage.setItem("medications", JSON.stringify(updated));
 
         window.dispatchEvent(new Event("medicationsUpdated"));
     };
 
-
     if (loading) return <Loader />;
+
+    // ✅ FINAL DATA FOR UI (NO DUPLICATION)
+    const allMeds = [...defaultMeds, ...medications];
 
     return (
         <div className="p-4 sm:p-6">
 
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
-                <h1 className="text-xl sm:text-2xl font-bold">
-                    Medication Reminders
-                </h1>
-            </div>
+            <h1 className="text-xl sm:text-2xl font-bold mb-6">
+                Medication Reminders
+            </h1>
 
             {/* Form */}
             <form
@@ -332,7 +322,7 @@ const Medications = () => {
                 <input
                     type="text"
                     name="dosage"
-                    placeholder="Dosage (e.g. 500mg)"
+                    placeholder="Dosage"
                     value={formData.dosage}
                     onChange={handleChange}
                     className="border p-2 rounded"
@@ -342,7 +332,7 @@ const Medications = () => {
                 <input
                     type="text"
                     name="time"
-                    placeholder="Time (Morning/Evening)"
+                    placeholder="Time"
                     value={formData.time}
                     onChange={handleChange}
                     className="border p-2 rounded"
@@ -352,81 +342,62 @@ const Medications = () => {
                 <input
                     type="text"
                     name="instructions"
-                    placeholder="Instructions (After food etc.)"
+                    placeholder="Instructions"
                     value={formData.instructions}
                     onChange={handleChange}
                     className="border p-2 rounded"
                     required
                 />
 
-                <button className="sm:col-span-2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                <button className="sm:col-span-2 bg-blue-600 text-white py-2 rounded">
                     Add Reminder
                 </button>
             </form>
 
             {/* List */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {medications.length === 0 ? (
-                    <p>No medications</p>
-                ) : (
-                    medications.map((med) => (
-                        <div
-                            key={med.id}
-                            className="bg-white p-4 rounded-xl shadow-md"
-                        >
-                            <div className="mb-2">
-                                <p className="font-semibold">{med.name}</p>
-                                <p className="text-sm text-gray-500">
-                                    {med.dosage} • {med.time}
-                                </p>
-                                <p className="text-xs text-gray-400">
-                                    {med.instructions}
-                                </p>
-                            </div>
+                {allMeds.map((med) => (
+                    <div key={med.id} className="bg-white p-4 rounded-xl shadow-md">
 
-                            <span
-                                className={`text-xs px-3 py-1 rounded-full ${med.status === "Taken"
-                                    ? "bg-green-100 text-green-600"
-                                    : med.status === "Missed"
-                                        ? "bg-red-100 text-red-600"
-                                        : "bg-yellow-100 text-yellow-600"
-                                    }`}
+                        <p className="font-semibold">{med.name}</p>
+                        <p className="text-sm text-gray-500">
+                            {med.dosage} • {med.time}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                            {med.instructions}
+                        </p>
+
+                        <span className="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-600">
+                            {med.status}
+                        </span>
+
+                        <div className="flex gap-2 mt-3">
+
+                            <button
+                                onClick={() => updateStatus(med.id, "Taken")}
+                                className="text-xs bg-green-500 text-white px-2 py-1 rounded"
                             >
-                                {med.status}
-                            </span>
+                                Taken
+                            </button>
 
-                            <div className="flex flex-wrap gap-2 mt-3">
+                            <button
+                                onClick={() => updateStatus(med.id, "Missed")}
+                                className="text-xs bg-red-500 text-white px-2 py-1 rounded"
+                            >
+                                Missed
+                            </button>
 
+                            {!med.isDefault && (
                                 <button
-                                    onClick={() =>
-                                        updateStatus(med.id, "Taken")
-                                    }
-                                    className="text-xs bg-green-500 text-white px-2 py-1 rounded"
+                                    onClick={() => handleDelete(med.id)}
+                                    className="text-xs text-red-500 ml-auto"
                                 >
-                                    Taken
+                                    Delete
                                 </button>
-
-                                <button
-                                    onClick={() =>
-                                        updateStatus(med.id, "Missed")
-                                    }
-                                    className="text-xs bg-red-500 text-white px-2 py-1 rounded"
-                                >
-                                    Missed
-                                </button>
-
-                                {!med.isDefault && (
-                                    <button
-                                        onClick={() => handleDelete(med.id)}
-                                        className="text-xs text-red-500 hover:underline sm:ml-auto"
-                                    >
-                                        Delete
-                                    </button>
-                                )}
-                            </div>
+                            )}
                         </div>
-                    ))
-                )}
+                    </div>
+                ))}
             </div>
         </div>
     );
