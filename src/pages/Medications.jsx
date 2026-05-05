@@ -293,7 +293,10 @@ const Medications = () => {
         );
 
         setMedications(updated);
-        localStorage.setItem("medications", JSON.stringify(updated));
+
+        // 🔥 store ONLY user data
+        const userOnly = updated.filter((med) => !med.isDefault);
+        localStorage.setItem("medications", JSON.stringify(userOnly));
 
         window.dispatchEvent(new Event("medicationsUpdated"));
     };

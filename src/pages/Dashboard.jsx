@@ -45,6 +45,12 @@ const Dashboard = () => {
 
     const defaultMedications = [
         {
+            id: "med-1",
+            name: "Paracetamol",
+            time: "08:00 AM",
+            isDefault: true,
+        },
+        {
             id: "med-2",
             name: "Vitamin D",
             time: "09:00 PM",
