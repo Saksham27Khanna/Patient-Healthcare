@@ -43,9 +43,24 @@ const Dashboard = () => {
         setAppointments([...defaultAppointments, ...stored]);
     };
 
+    const defaultMedications = [
+        {
+            id: "med-1",
+            name: "Paracetamol",
+            time: "08:00 AM",
+            isDefault: true,
+        },
+        {
+            id: "med-2",
+            name: "Vitamin D",
+            time: "09:00 PM",
+            isDefault: true,
+        },
+    ];
+
     const loadMedications = () => {
         const stored = JSON.parse(localStorage.getItem("medications")) || [];
-        setMedications(stored);
+        setMedications([...defaultMedications, ...stored]);
     };
 
     const loadNotes = () => {
